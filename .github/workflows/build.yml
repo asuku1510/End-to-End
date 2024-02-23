@@ -29,6 +29,12 @@ jobs:
      runs-on: ubuntu-latest
      steps:
        - run: echo "hello"
+  trivy:
+     needs: setup
+     runs-on: ubuntu-latest
+     steps:
+       - run: echo "hello"
+          
           
           
        
