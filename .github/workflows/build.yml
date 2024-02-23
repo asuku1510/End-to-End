@@ -10,13 +10,13 @@ jobs:
      runs-on: ubuntu-latest
      steps:
        - run: echo "hello"
-  sast:
+  checkov:
      needs: setup
      runs-on: ubuntu-latest
      steps:
        - run: echo "hello"
   plan:
-     needs: sast
+     needs: checkov
      runs-on: ubuntu-latest
      steps:
        - run: echo "hello"
@@ -34,6 +34,12 @@ jobs:
      runs-on: ubuntu-latest
      steps:
        - run: echo "hello"
+  dockerise:
+     needs: trivy
+     runs-on: ubuntu-latest
+     steps:
+       - run: echo "hello"
+          
           
           
           
