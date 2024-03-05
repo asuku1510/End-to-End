@@ -1,0 +1,54 @@
+#shared-repo-create.yaml
+name: apply
+
+on:
+  workflow_call:
+     inputs:
+        target-env:
+           required: true
+           type: string 
+        secrets:
+          required: true
+          type: string
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  URL: ${{ secrets.JF_URL }}
+  JF_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN }}
+  
+jobs:
+  check:
+     runs-on: ubuntu-latest
+     steps:
+       - name: select environment
+         id: select-environment
+         run: |
+            if [ ${{ inputs.target-env }} == dev ]; then
+               echo "selected-stage=dev" >> "$GITHUB_OUTPUT"
+            elif [ ${{ inputs.target-env }} == stage ]; then
+               echo "selected-stage=stage" >> "$GITHUB_OUTPUT"
+            elif [ ${{ inputs.target-env }} == prod ]; then
+               echo "selected-stage=prod" >> "$GITHUB_OUTPUT"
+            else
+               echo " Select a valid environment"
+            fi
+     outputs:
+        selected-stage: ${{ steps.select-environment.outputs.selected-stage }}
+        
+  deploy-dev:
+    needs: check
+    if: ${{ needs.check.outputs.selected-stage == 'dev' }}
+    uses: Wemadevops/shared-workflows/.github/workflows/apply.yaml@main
+    secrets: inherit
+    
+  deploy-stage:
+    needs: check
+    if: ${{ needs.check.outputs.selected-stage == 'stage' }}
+    uses: Wemadevops/shared-workflows/.github/workflows/apply.yaml@main
+    secrets: inherit
+    
+  deploy-prod:
+    needs: check
+    if: ${{ needs.check.outputs.selected-stage == 'prod' }}
+    uses: Wemadevops/shared-workflows/.github/workflows/apply.yaml@main
+    secrets: inherit
